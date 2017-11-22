@@ -54,8 +54,11 @@ public class GamePlayBlackJack extends GamePlay {
 
 		HandScoreBlackJack HSB = (HandScoreBlackJack)h.ScoreHand();
 		
-		// TODO: Determine if the player can draw another card (are they busted?)
-
+		for (int n : HSB.getNumericScores()) {
+			if (n <= 21) {
+				bCanPlayerDraw = true;
+			}
+		}
 		return bCanPlayerDraw;
 	}
 	
@@ -68,33 +71,65 @@ public class GamePlayBlackJack extends GamePlay {
 		
 		HandScoreBlackJack HSB = (HandScoreBlackJack)hDealer.ScoreHand();
 		
-		//TODO: Determine if the dealer MUST draw.
-		//		Dealer must draw unless they are bust and they don't have a 
-		//		numeric score between 17-21.  
-		//		5-5 = 10, they must draw
-		//		A-6 = 7 or 17, they must stay (because they have 17)
-		//		J-J-J = 30, they are busted, they can't draw
-		
-		
+		for (int n : HSB.getNumericScores()) {
+			if (n > 16) {
+				bDoesDealerHaveToDraw = false;
+			}
+		}
 		return bDoesDealerHaveToDraw;
 	}
 	
+	private boolean isDealerBusted() throws HandException {
+
+		HandScoreBlackJack HSB = (HandScoreBlackJack)hDealer.ScoreHand();
+		boolean bDealerIsBusted = true;
+		
+		for (int n : HSB.getNumericScores()) {
+			if (n <= 21) {
+				bDealerIsBusted = false;
+			}
+		}
+		return bDealerIsBusted;
+	}
 	
+	private int BestScore(HandScoreBlackJack HSB) throws HandException {
 	
+		int k = 0;
+		for (int n : HSB.getNumericScores()) {
+			if (n > k && n <= 21) {
+				k = n;
+			}
+		}
+		return k;
+	}
 	
-	
-	
-	
-	public void ScoreGame(GamePlayerHand GPH)
+	public void ScoreGame(GamePlayerHand GPH) throws HandException
 	{
 		boolean bIsHandWinner = false;
+
+		Hand h = this.gethmGameHand(GPH);
+		HandScoreBlackJack HSB = (HandScoreBlackJack)h.ScoreHand();
+		HandScoreBlackJack HSBDealer = (HandScoreBlackJack)hDealer.ScoreHand();
+
+		if (bCanPlayerDraw(GPH) && !isDealerBusted() ) {
+			{
+				if (BestScore(HSB) > BestScore(HSBDealer)) {
+					 
+				}
+				else if (BestScore(HSB) == BestScore(HSBDealer)) {
+					
+				}
+			}
+		}
+	
+	
 		//	TODO: Determine if player is a winner
 		
 		//	TODO: Find the Dealer's hand
 		//	TODO: Score Dealer's hand
 		
-		//	TODO: Find Player's hand
-		//	TODO: Score Player's hand
+		//	TODO: -Find Player's hand 
+		//	TODO: -Score Player's hand
 		
 		//	TODO: If Player's hand > Dealer's hand and <= 21, then eBlackJackResult = WIN
 		//			If Player's hand < Dealer's hand and Dealer didn't bust = LOSE
