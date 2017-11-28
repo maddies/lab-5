@@ -7,19 +7,18 @@ import java.util.UUID;
 
 import pkgException.DeckException;
 import pkgException.HandException;
-
+import pkgEnum.eBlackJackResult;
 import pkgEnum.eGameType;
 
 public class GamePlayBlackJack extends GamePlay {
 
 	private Player pDealer = new Player("Dealer", 0);
 	private Hand hDealer = new HandBlackJack();
-	
-	
+
 	public GamePlayBlackJack(HashMap<UUID, Player> hmTablePlayers, Deck dGameDeck) {
-	
-		super(eGameType.BLACKJACK, hmTablePlayers, dGameDeck);	
-		
+
+		super(eGameType.BLACKJACK, hmTablePlayers, dGameDeck);
+
 		Iterator it = hmTablePlayers.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
@@ -38,9 +37,9 @@ public class GamePlayBlackJack extends GamePlay {
 		if (bCanPlayerDraw(GPH)) {
 			Hand h = this.gethmGameHand(GPH);
 			c = h.Draw(this.getdGameDeck());
-			
+
 			h.AddCard(c);
-			
+
 			this.putHandToGame(GPH, h);
 
 		}
@@ -52,8 +51,8 @@ public class GamePlayBlackJack extends GamePlay {
 
 		Hand h = this.gethmGameHand(GPH);
 
-		HandScoreBlackJack HSB = (HandScoreBlackJack)h.ScoreHand();
-		
+		HandScoreBlackJack HSB = (HandScoreBlackJack) h.ScoreHand();
+
 		for (int n : HSB.getNumericScores()) {
 			if (n <= 21) {
 				bCanPlayerDraw = true;
@@ -61,16 +60,12 @@ public class GamePlayBlackJack extends GamePlay {
 		}
 		return bCanPlayerDraw;
 	}
-	
-	
-	
-	public boolean bDoesDealerHaveToDraw() throws HandException
-	{
+
+	public boolean bDoesDealerHaveToDraw() throws HandException {
 		boolean bDoesDealerHaveToDraw = true;
-		
-		
-		HandScoreBlackJack HSB = (HandScoreBlackJack)hDealer.ScoreHand();
-		
+
+		HandScoreBlackJack HSB = (HandScoreBlackJack) hDealer.ScoreHand();
+
 		for (int n : HSB.getNumericScores()) {
 			if (n > 16) {
 				bDoesDealerHaveToDraw = false;
@@ -78,12 +73,12 @@ public class GamePlayBlackJack extends GamePlay {
 		}
 		return bDoesDealerHaveToDraw;
 	}
-	
+
 	private boolean isDealerBusted() throws HandException {
 
-		HandScoreBlackJack HSB = (HandScoreBlackJack)hDealer.ScoreHand();
+		HandScoreBlackJack HSB = (HandScoreBlackJack) hDealer.ScoreHand();
 		boolean bDealerIsBusted = true;
-		
+
 		for (int n : HSB.getNumericScores()) {
 			if (n <= 21) {
 				bDealerIsBusted = false;
@@ -91,9 +86,9 @@ public class GamePlayBlackJack extends GamePlay {
 		}
 		return bDealerIsBusted;
 	}
-	
+
 	private int BestScore(HandScoreBlackJack HSB) throws HandException {
-	
+
 		int k = 0;
 		for (int n : HSB.getNumericScores()) {
 			if (n > k && n <= 21) {
@@ -102,41 +97,49 @@ public class GamePlayBlackJack extends GamePlay {
 		}
 		return k;
 	}
-	
-	public void ScoreGame(GamePlayerHand GPH) throws HandException
-	{
-		boolean bIsHandWinner = false;
 
+	public void ScoreGame(GamePlayerHand GPH) throws HandException {
+
+;
 		Hand h = this.gethmGameHand(GPH);
-		HandScoreBlackJack HSB = (HandScoreBlackJack)h.ScoreHand();
-		HandScoreBlackJack HSBDealer = (HandScoreBlackJack)hDealer.ScoreHand();
+		HandScoreBlackJack HSB = (HandScoreBlackJack) h.ScoreHand();
+		HandScoreBlackJack HSBDealer = (HandScoreBlackJack) hDealer.ScoreHand();
 
-		if (bCanPlayerDraw(GPH) && !isDealerBusted() ) {
+		// player and dealer did NOT bust
+		if (bCanPlayerDraw(GPH) && !isDealerBusted()) {
 			{
+				// win
 				if (BestScore(HSB) > BestScore(HSBDealer)) {
-					 
+					eBlackJackResult result = eBlackJackResult.WIN;
 				}
+				// tie
 				else if (BestScore(HSB) == BestScore(HSBDealer)) {
-					
+					eBlackJackResult result = eBlackJackResult.LOSE;
+				}
+				// lose
+				else {
+					eBlackJackResult result = eBlackJackResult.TIE;
 				}
 			}
 		}
-	
-	
-		//	TODO: Determine if player is a winner
+		// just dealer busted
+		if (bCanPlayerDraw(GPH) && isDealerBusted()) {
+			eBlackJackResult result = eBlackJackResult.WIN;
+		}
+		// just player busted
+		if (!bCanPlayerDraw(GPH) && !isDealerBusted()) {
+			eBlackJackResult result = eBlackJackResult.LOSE;
+		}
+		// player and dealer BOTH bust
+		if (!bCanPlayerDraw(GPH) && isDealerBusted()) {
+			eBlackJackResult result = eBlackJackResult.LOSE;
+		}
 		
-		//	TODO: Find the Dealer's hand
-		//	TODO: Score Dealer's hand
-		
-		//	TODO: -Find Player's hand 
-		//	TODO: -Score Player's hand
-		
-		//	TODO: If Player's hand > Dealer's hand and <= 21, then eBlackJackResult = WIN
-		//			If Player's hand < Dealer's hand and Dealer didn't bust = LOSE
-		//			If Player's hand == Dealer's hand and both didn't bust = TIE
-		
-		
+		// 
 	}
+
+
+	
 
 	public Player getpDealer() {
 		return pDealer;
