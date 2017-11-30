@@ -14,6 +14,7 @@ public class GamePlayBlackJack extends GamePlay {
 
 	private Player pDealer = new Player("Dealer", 0);
 	private Hand hDealer = new HandBlackJack();
+	private eBlackJackResult result;
 
 	public GamePlayBlackJack(HashMap<UUID, Player> hmTablePlayers, Deck dGameDeck) {
 
@@ -29,7 +30,6 @@ public class GamePlayBlackJack extends GamePlay {
 		}
 	}
 
-	@Override
 	protected Card Draw(GamePlayerHand GPH) throws DeckException, HandException {
 
 		Card c = null;
@@ -45,7 +45,26 @@ public class GamePlayBlackJack extends GamePlay {
 		}
 		return c;
 	}
+	
+	protected Card Draw2(GamePlayerHand GPH, Card c) throws DeckException, HandException {
 
+
+		if (bCanPlayerDraw(GPH)) {
+			Hand h = this.gethmGameHand(GPH);
+			c = h.Draw(this.getdGameDeck());
+
+			h.AddCard(c);
+
+			this.putHandToGame(GPH, h);
+
+		}
+		return c;
+	}
+	public void dealerHand(Card card) throws DeckException, HandException {
+		Hand dh = hDealer;
+		dh.AddCard(card);
+	}
+	
 	private boolean bCanPlayerDraw(GamePlayerHand GPH) throws HandException {
 		boolean bCanPlayerDraw = false;
 
@@ -60,7 +79,9 @@ public class GamePlayBlackJack extends GamePlay {
 		}
 		return bCanPlayerDraw;
 	}
-
+	// test helper method
+	
+	
 	public boolean bDoesDealerHaveToDraw() throws HandException {
 		boolean bDoesDealerHaveToDraw = true;
 
@@ -105,41 +126,47 @@ public class GamePlayBlackJack extends GamePlay {
 		HandScoreBlackJack HSB = (HandScoreBlackJack) h.ScoreHand();
 		HandScoreBlackJack HSBDealer = (HandScoreBlackJack) hDealer.ScoreHand();
 
-		// player and dealer did NOT bust
+		
+		
+		
+		//player and dealer did NOT bust
 		if (bCanPlayerDraw(GPH) && !isDealerBusted()) {
 			{
 				// win
 				if (BestScore(HSB) > BestScore(HSBDealer)) {
-					eBlackJackResult result = eBlackJackResult.WIN;
+					result = eBlackJackResult.WIN;
 				}
 				// tie
 				else if (BestScore(HSB) == BestScore(HSBDealer)) {
-					eBlackJackResult result = eBlackJackResult.LOSE;
+					result = eBlackJackResult.LOSE;
 				}
 				// lose
 				else {
-					eBlackJackResult result = eBlackJackResult.TIE;
+					result = eBlackJackResult.TIE;
 				}
 			}
 		}
 		// just dealer busted
 		if (bCanPlayerDraw(GPH) && isDealerBusted()) {
-			eBlackJackResult result = eBlackJackResult.WIN;
+			result = eBlackJackResult.WIN;
 		}
 		// just player busted
 		if (!bCanPlayerDraw(GPH) && !isDealerBusted()) {
-			eBlackJackResult result = eBlackJackResult.LOSE;
+			result = eBlackJackResult.LOSE;
 		}
 		// player and dealer BOTH bust
 		if (!bCanPlayerDraw(GPH) && isDealerBusted()) {
-			eBlackJackResult result = eBlackJackResult.LOSE;
+			result = eBlackJackResult.LOSE;
 		}
 		
-		// 
+		
+	}
+	
+	public eBlackJackResult getResult() {
+		return result;
 	}
 
 
-	
 
 	public Player getpDealer() {
 		return pDealer;
